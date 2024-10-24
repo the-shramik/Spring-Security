@@ -1,6 +1,6 @@
 package com.springsecurity.filter;
 
-import com.springsecurity.constants.ApplicationConstant;
+import com.springsecurity.constatnts.ApplicationConstant;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -20,23 +20,23 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public class JwtTokenValidator extends OncePerRequestFilter {
+public class JwtTokenValidatorFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String jwtToken=getJwtFromRequest(request);
 
-        if(jwtToken!=null){
+        if (jwtToken!=null){
 
-            try{
-
+            try {
                 Environment environment=getEnvironment();
 
-                if (environment!=null){
+                if(environment!=null){
 
                     String secret=environment.getProperty(ApplicationConstant.JWT_SECRET_KEY,ApplicationConstant.JWT_SECRET_DEFAULT_VALUE);
 
-                    SecretKey secretKey= Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+                    SecretKey secretKey=
+                            Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 
                     if(secretKey!=null){
                         Claims claims= Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(jwtToken).getPayload();
@@ -52,9 +52,10 @@ public class JwtTokenValidator extends OncePerRequestFilter {
                 }
             }
             catch (Exception e){
-                throw new BadRequestException("Invalid JWT token");
+                throw new BadRequestException("Invalid JWT token!");
             }
         }
+
 
         filterChain.doFilter(request,response);
     }
